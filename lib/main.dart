@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/theme/app_theme.dart';
+import 'package:orbit_planner/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:orbit_planner/theme_preview_screen.dart';
 
 void main() => runApp(const MoodOrbitApp());
@@ -13,6 +14,8 @@ class MoodOrbitApp extends StatefulWidget {
 
 class _MoodOrbitAppState extends State<MoodOrbitApp> {
   ThemeMode _mode = ThemeMode.light;
+
+  bool _onboardingDone = false;
 
   void _toggleTheme() {
     setState(() {
@@ -28,9 +31,18 @@ class _MoodOrbitAppState extends State<MoodOrbitApp> {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: _mode,
-      home: ThemePreviewScreen(
-        isDark: _mode == ThemeMode.dark,
-        onToggleTheme: _toggleTheme,
+      home: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 260),
+        child: _onboardingDone
+            ? ThemePreviewScreen(
+                key: const ValueKey('home'),
+                isDark: _mode == ThemeMode.dark,
+                onToggleTheme: _toggleTheme,
+              )
+            : OnboardingScreen(
+                key: const ValueKey('onboarding'),
+                onFinished: () => setState(() => _onboardingDone = true),
+              ),
       ),
     );
   }
