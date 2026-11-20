@@ -8,14 +8,7 @@ import 'package:orbit_planner/features/tasks/presentation/screens/list_view_scre
 import 'package:orbit_planner/features/tasks/presentation/screens/orbit_view_screen.dart';
 
 class AppShell extends StatefulWidget {
-  const AppShell({
-    super.key,
-    required this.isDark,
-    required this.onToggleTheme,
-  });
-
-  final bool isDark;
-  final VoidCallback onToggleTheme;
+  const AppShell({super.key});
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -30,17 +23,19 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
+    const pages = <Widget>[
+      OrbitViewScreen(),
+      TaskListScreen(),
+      AchievementsScreen(),
+      SettingsScreen(),
+    ];
+
     final body = IndexedStack(
       key: _bodyKey,
       index: _index,
       children: [
-        const OrbitViewScreen(),
-        const TaskListScreen(),
-        const AchievementsScreen(),
-        SettingsScreen(
-          isDark: widget.isDark,
-          onToggleTheme: widget.onToggleTheme,
-        ),
+        for (var i = 0; i < pages.length; i++)
+          TickerMode(enabled: i == _index, child: pages[i]),
       ],
     );
 
@@ -77,7 +72,6 @@ class _AppShellState extends State<AppShell> {
               selectedIndex: _index,
               onDestinationSelected: _select,
               extended: extended,
-              // لما الـ rail يكون extended لازم labelType يبقى null
               labelType: extended ? null : NavigationRailLabelType.all,
               leading: _RailLogo(extended: extended),
               destinations: [

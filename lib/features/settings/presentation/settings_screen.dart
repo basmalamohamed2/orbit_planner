@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/responsive/responsive_layout.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
+import 'package:orbit_planner/features/settings/presentation/view_models/theme_view_model.dart';
+import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({
-    super.key,
-    required this.isDark,
-    required this.onToggleTheme,
-  });
-
-  final bool isDark;
-  final VoidCallback onToggleTheme;
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<ThemeViewModel>();
     final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
     final orbit = context.orbit;
@@ -35,8 +31,8 @@ class SettingsScreen extends StatelessWidget {
                   side: BorderSide(color: orbit.outline),
                 ),
                 child: SwitchListTile(
-                  value: isDark,
-                  onChanged: (_) => onToggleTheme(),
+                  value: theme.isDark,
+                  onChanged: (_) => theme.toggle(),
                   title: Text('Earthy dark mode', style: text.titleMedium),
                   subtitle: Text(
                     'Warm charcoal instead of cream paper',
