@@ -1,16 +1,23 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:orbit_planner/core/motion/motion.dart';
 import 'package:orbit_planner/core/shapes/star_path.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
 import 'package:orbit_planner/features/achievements/presentation/night_sky/night_sky_layout.dart';
 import 'package:orbit_planner/features/tasks/domain/task.dart';
 
 class NightSky extends StatefulWidget {
-  const NightSky({super.key, required this.stars, required this.onStarTap});
+  const NightSky({
+    super.key,
+    required this.stars,
+    required this.onStarTap,
+    this.motionEnabled = true,
+  });
 
   final List<Task> stars;
   final ValueChanged<Task> onStarTap;
+  final bool motionEnabled;
 
   @override
   State<NightSky> createState() => _NightSkyState();
@@ -26,10 +33,14 @@ class _NightSkyState extends State<NightSky>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
-      _controller.stop();
-    } else if (!_controller.isAnimating) {
-      _controller.repeat();
+    syncLoopingAnimation(context, _controller, enabled: widget.motionEnabled);
+  }
+
+  @override
+  void didUpdateWidget(NightSky oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.motionEnabled != widget.motionEnabled) {
+      syncLoopingAnimation(context, _controller, enabled: widget.motionEnabled);
     }
   }
 

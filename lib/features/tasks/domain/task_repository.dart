@@ -6,4 +6,6 @@ abstract class TaskRepository {
   Future<void> saveTask(Task task);
 
   Future<void> deleteTask(String id);
+
+  Future<void> replaceAll(List<Task> tasks);
 }

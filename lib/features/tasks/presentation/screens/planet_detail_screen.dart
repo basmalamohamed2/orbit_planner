@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/responsive/breakpoints.dart';
 import 'package:orbit_planner/core/responsive/responsive_layout.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
+import 'package:orbit_planner/features/settings/presentation/view_models/settings_view_model.dart';
 import 'package:orbit_planner/features/tasks/domain/task.dart';
 import 'package:orbit_planner/features/tasks/presentation/task_ui.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
@@ -112,6 +113,9 @@ class _PlanetHeader extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final orbit = context.orbit;
     final dates = MaterialLocalizations.of(context);
+    final motion = context.select<SettingsViewModel, bool>(
+      (s) => s.motionEnabled,
+    );
 
     final statusLabel = task.isCompleted
         ? 'Completed ${dates.formatMediumDate(task.completedAt ?? DateTime.now())}'
@@ -124,7 +128,11 @@ class _PlanetHeader extends StatelessWidget {
           builder: (context, constraints) {
             final size = math.min(constraints.maxWidth, 300.0);
             return Center(
-              child: PlanetWithMoons(task: task, size: size),
+              child: PlanetWithMoons(
+                task: task,
+                size: size,
+                motionEnabled: motion,
+              ),
             );
           },
         ),

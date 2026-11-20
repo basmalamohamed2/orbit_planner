@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:orbit_planner/core/motion/motion.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
 import 'package:orbit_planner/features/tasks/presentation/orbit/orbit_layout.dart';
 import 'package:orbit_planner/features/tasks/presentation/orbit/orbit_painter.dart';
@@ -12,11 +13,13 @@ class OrbitCanvas extends StatefulWidget {
     required this.planets,
     required this.selectedId,
     required this.onSelect,
+    this.motionEnabled = true,
   });
 
   final List<OrbitPlanet> planets;
   final String? selectedId;
   final ValueChanged<String?> onSelect;
+  final bool motionEnabled;
 
   @override
   State<OrbitCanvas> createState() => OrbitCanvasState();
@@ -38,7 +41,11 @@ class OrbitCanvasState extends State<OrbitCanvas>
   double _size = 0;
 
   void celebrate(String taskId) {
-    if (MediaQuery.disableAnimationsOf(context) || _size == 0) return;
+    if (!widget.motionEnabled ||
+        MediaQuery.disableAnimationsOf(context) ||
+        _size == 0) {
+      return;
+    }
 
     final matches = widget.planets.where((p) => p.task.id == taskId);
     if (matches.isEmpty) return;
@@ -57,10 +64,14 @@ class OrbitCanvasState extends State<OrbitCanvas>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
-      _controller.stop();
-    } else if (!_controller.isAnimating) {
-      _controller.repeat();
+    syncLoopingAnimation(context, _controller, enabled: widget.motionEnabled);
+  }
+
+  @override
+  void didUpdateWidget(OrbitCanvas oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.motionEnabled != widget.motionEnabled) {
+      syncLoopingAnimation(context, _controller, enabled: widget.motionEnabled);
     }
   }
 

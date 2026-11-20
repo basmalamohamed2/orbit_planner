@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:orbit_planner/core/motion/motion.dart';
 import 'package:orbit_planner/core/shapes/orbit_drawing.dart';
 import 'package:orbit_planner/core/shapes/star_path.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
@@ -14,10 +15,16 @@ const _moonRadius = 0.035;
 const _maxMoons = 8;
 
 class PlanetWithMoons extends StatefulWidget {
-  const PlanetWithMoons({super.key, required this.task, required this.size});
+  const PlanetWithMoons({
+    super.key,
+    required this.task,
+    required this.size,
+    this.motionEnabled = true,
+  });
 
   final Task task;
   final double size;
+  final bool motionEnabled;
 
   @override
   State<PlanetWithMoons> createState() => _PlanetWithMoonsState();
@@ -25,7 +32,6 @@ class PlanetWithMoons extends StatefulWidget {
 
 class _PlanetWithMoonsState extends State<PlanetWithMoons>
     with SingleTickerProviderStateMixin {
-  // لفة كاملة للأقمار = 60 ثانية
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 60),
@@ -34,10 +40,14 @@ class _PlanetWithMoonsState extends State<PlanetWithMoons>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
-      _controller.stop();
-    } else if (!_controller.isAnimating) {
-      _controller.repeat();
+    syncLoopingAnimation(context, _controller, enabled: widget.motionEnabled);
+  }
+
+  @override
+  void didUpdateWidget(PlanetWithMoons oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.motionEnabled != widget.motionEnabled) {
+      syncLoopingAnimation(context, _controller, enabled: widget.motionEnabled);
     }
   }
 

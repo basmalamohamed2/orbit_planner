@@ -100,6 +100,21 @@ class TasksViewModel extends ChangeNotifier {
     await _repository.saveTask(updated);
   }
 
+  Future<void> restoreTask(Task task) async {
+    if (_tasks.any((t) => t.id == task.id)) return;
+    _tasks.add(task);
+    notifyListeners();
+    await _repository.saveTask(task);
+  }
+
+  Future<void> replaceAll(List<Task> tasks) async {
+    _tasks = List.of(tasks);
+    notifyListeners();
+    await _repository.replaceAll(tasks);
+  }
+
+  Future<void> clearAll() => replaceAll(const []);
+
   Future<void> deleteTask(String id) async {
     _tasks.removeWhere((t) => t.id == id);
     notifyListeners();

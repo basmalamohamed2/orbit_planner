@@ -23,61 +23,58 @@ class TaskTile extends StatelessWidget {
         ? '${task.category.label} · Completed'
         : '${task.category.label} · ${task.dueLabel(DateTime.now())}';
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        color: scheme.surfaceContainer,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: orbit.outline),
-        ),
-        child: ListTile(
-          onTap: () => openPlanetDetail(context, task.id),
-          leading: SizedBox(
-            width: 24,
-            height: 24,
-            child: Center(
-              child: Container(
-                width: task.priority.dotSize,
-                height: task.priority.dotSize,
-                decoration: BoxDecoration(
-                  color: task.category.color(orbit),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: orbit.shadow,
-                      offset: const Offset(1.5, 1.5),
-                    ),
-                  ],
-                ),
+    return Material(
+      color: scheme.surfaceContainer,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: orbit.outline),
+      ),
+      child: ListTile(
+        onTap: () => openPlanetDetail(context, task.id),
+        leading: SizedBox(
+          width: 24,
+          height: 24,
+          child: Center(
+            child: Container(
+              width: task.priority.dotSize,
+              height: task.priority.dotSize,
+              decoration: BoxDecoration(
+                color: task.category.color(orbit),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: orbit.shadow,
+                    offset: const Offset(1.5, 1.5),
+                  ),
+                ],
               ),
             ),
           ),
-          title: Text(
-            task.title,
-            style: text.titleMedium?.copyWith(
-              decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-              color: task.isCompleted ? orbit.muted : null,
-            ),
+        ),
+        title: Text(
+          task.title,
+          style: text.titleMedium?.copyWith(
+            decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+            color: task.isCompleted ? orbit.muted : null,
           ),
-          subtitle: Text(
-            subtitle,
-            style: text.bodySmall?.copyWith(
-              color: overdue ? scheme.secondary : null,
-            ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: text.bodySmall?.copyWith(
+            color: overdue ? scheme.secondary : null,
           ),
-          trailing: IconButton(
-            tooltip: task.isCompleted ? 'Reopen' : 'Complete',
-            icon: Icon(
-              task.isCompleted
-                  ? Icons.check_circle
-                  : Icons.radio_button_unchecked,
-              color: task.isCompleted ? orbit.star : orbit.muted,
-            ),
-            onPressed: () =>
-                context.read<TasksViewModel>().toggleComplete(task.id),
+        ),
+        trailing: IconButton(
+          tooltip: task.isCompleted ? 'Reopen' : 'Complete',
+          icon: Icon(
+            task.isCompleted
+                ? Icons.check_circle
+                : Icons.radio_button_unchecked,
+            color: task.isCompleted ? orbit.star : orbit.muted,
           ),
+          onPressed: () =>
+              context.read<TasksViewModel>().toggleComplete(task.id),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/responsive/breakpoints.dart';
 import 'package:orbit_planner/core/responsive/responsive_layout.dart';
+import 'package:orbit_planner/features/settings/presentation/view_models/settings_view_model.dart';
 import 'package:orbit_planner/features/tasks/presentation/orbit/orbit_canvas.dart';
 import 'package:orbit_planner/features/tasks/presentation/orbit/orbit_layout.dart';
 import 'package:orbit_planner/features/tasks/presentation/screens/planet_detail_screen.dart';
@@ -25,6 +26,10 @@ class _OrbitViewScreenState extends State<OrbitViewScreen> {
   Widget build(BuildContext context) {
     final vm = context.watch<TasksViewModel>();
 
+    final motion = context.select<SettingsViewModel, bool>(
+      (s) => s.motionEnabled,
+    );
+
     final planets = OrbitLayout.build(vm.activeTasks, DateTime.now());
 
     final candidate = _selectedId == null ? null : vm.taskById(_selectedId!);
@@ -34,6 +39,7 @@ class _OrbitViewScreenState extends State<OrbitViewScreen> {
 
     final canvas = OrbitCanvas(
       key: _canvasKey,
+      motionEnabled: motion,
       planets: planets,
       selectedId: selected?.id,
       onSelect: (id) => setState(() => _selectedId = id),

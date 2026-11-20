@@ -5,6 +5,7 @@ import 'package:orbit_planner/core/widgets/placeholder_view.dart';
 import 'package:orbit_planner/features/achievements/domain/achievement_stats.dart';
 import 'package:orbit_planner/features/achievements/presentation/night_sky/night_sky.dart';
 import 'package:orbit_planner/features/achievements/presentation/widgets/stats_row.dart';
+import 'package:orbit_planner/features/settings/presentation/view_models/settings_view_model.dart';
 import 'package:orbit_planner/features/tasks/presentation/screens/planet_detail_screen.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,10 @@ class AchievementsScreen extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final orbit = context.orbit;
     final dates = MaterialLocalizations.of(context);
+
+    final motion = context.select<SettingsViewModel, bool>(
+      (s) => s.motionEnabled,
+    );
 
     final newestFirst = vm.completedTasks;
     final stats = AchievementStats.from(newestFirst, DateTime.now());
@@ -42,6 +47,7 @@ class AchievementsScreen extends StatelessWidget {
                     StatsRow(stats: stats),
                     const SizedBox(height: 20),
                     NightSky(
+                      motionEnabled: motion,
                       stars: newestFirst.reversed.toList(),
                       onStarTap: (task) => openPlanetDetail(context, task.id),
                     ),
