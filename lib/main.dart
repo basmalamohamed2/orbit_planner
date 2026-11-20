@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:orbit_planner/app/shell/app_shell.dart';
 import 'package:orbit_planner/core/theme/app_theme.dart';
 import 'package:orbit_planner/features/onboarding/presentation/onboarding_screen.dart';
-import 'package:orbit_planner/theme_preview_screen.dart';
 
 void main() => runApp(const MoodOrbitApp());
 
@@ -34,8 +34,8 @@ class _MoodOrbitAppState extends State<MoodOrbitApp> {
       home: AnimatedSwitcher(
         duration: const Duration(milliseconds: 260),
         child: _onboardingDone
-            ? ThemePreviewScreen(
-                key: const ValueKey('home'),
+            ? AppShell(
+                key: const ValueKey('shell'),
                 isDark: _mode == ThemeMode.dark,
                 onToggleTheme: _toggleTheme,
               )

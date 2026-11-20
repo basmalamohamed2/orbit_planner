@@ -45,6 +45,9 @@ class AppTheme {
   }) {
     final textTheme = _textTheme(scheme.onSurface, orbit.muted);
 
+    Color navColor(Set<WidgetState> states) =>
+        states.contains(WidgetState.selected) ? scheme.onSurface : orbit.muted;
+
     return ThemeData(
       useMaterial3: true,
       brightness: scheme.brightness,
@@ -58,6 +61,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
+        titleTextStyle: textTheme.headlineMedium,
       ),
       dividerTheme: DividerThemeData(color: scheme.outline, thickness: 1),
       filledButtonTheme: FilledButtonThemeData(
@@ -69,6 +73,31 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: scheme.surfaceContainer,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        height: 68,
+        indicatorColor: orbit.outline,
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(color: navColor(states), size: 24),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => textTheme.labelSmall!.copyWith(color: navColor(states)),
+        ),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: scheme.surfaceContainer,
+        indicatorColor: orbit.outline,
+        selectedIconTheme: IconThemeData(color: scheme.onSurface),
+        unselectedIconTheme: IconThemeData(color: orbit.muted),
+        selectedLabelTextStyle: textTheme.labelLarge!.copyWith(
+          color: scheme.onSurface,
+        ),
+        unselectedLabelTextStyle: textTheme.labelLarge!.copyWith(
+          color: orbit.muted,
         ),
       ),
     );
