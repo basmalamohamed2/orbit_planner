@@ -20,7 +20,7 @@ class TaskTile extends StatelessWidget {
     final overdue = !task.isCompleted && days < 0;
     final subtitle = task.isCompleted
         ? '${task.category.label} · Completed'
-        : '${task.category.label} · ${task.dueLabel(DateTime.now())}';
+        : '${task.category.label} · ${_dueLabel(days)}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -79,5 +79,13 @@ class TaskTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  static String _dueLabel(int days) {
+    if (days < -1) return 'Overdue by ${-days} days';
+    if (days == -1) return 'Overdue by 1 day';
+    if (days == 0) return 'Due today';
+    if (days == 1) return 'Due tomorrow';
+    return 'Due in $days days';
   }
 }

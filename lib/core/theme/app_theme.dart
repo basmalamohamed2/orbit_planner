@@ -100,6 +100,71 @@ class AppTheme {
           color: orbit.muted,
         ),
       ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: scheme.surfaceContainer,
+        surfaceTintColor: Colors.transparent,
+        showDragHandle: true,
+        dragHandleColor: orbit.muted,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          side: BorderSide(color: orbit.outline),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: scheme.surface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        hintStyle: textTheme.bodyMedium?.copyWith(color: orbit.muted),
+        errorStyle: textTheme.bodySmall?.copyWith(color: scheme.secondary),
+        border: _inputBorder(orbit.outline),
+        enabledBorder: _inputBorder(orbit.outline),
+        focusedBorder: _inputBorder(scheme.onSurface, width: 1.5),
+        errorBorder: _inputBorder(scheme.secondary),
+        focusedErrorBorder: _inputBorder(scheme.secondary, width: 1.5),
+      ),
+      sliderTheme: SliderThemeData(
+        trackHeight: 4,
+        activeTrackColor: scheme.secondary,
+        inactiveTrackColor: orbit.outline,
+        thumbColor: scheme.secondary,
+        overlayColor: scheme.secondary.withAlpha(31),
+        activeTickMarkColor: scheme.onSecondary,
+        inactiveTickMarkColor: orbit.muted,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: scheme.surface,
+        selectedColor: orbit.outline,
+        side: BorderSide(color: orbit.outline),
+        labelStyle: textTheme.labelLarge,
+        showCheckmark: false,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.secondary,
+        foregroundColor: scheme.onSecondary,
+        elevation: 0,
+        focusElevation: 0,
+        hoverElevation: 0,
+        highlightElevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: scheme.onSurface,
+        contentTextStyle: textTheme.bodyMedium?.copyWith(color: scheme.surface),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  static OutlineInputBorder _inputBorder(Color color, {double width = 1}) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: color, width: width),
     );
   }
 

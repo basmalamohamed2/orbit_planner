@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/responsive/responsive_layout.dart';
 import 'package:orbit_planner/core/widgets/placeholder_view.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
+import 'package:orbit_planner/features/tasks/presentation/widgets/add_task_fab.dart';
 import 'package:orbit_planner/features/tasks/presentation/widgets/task_tile.dart';
 import 'package:provider/provider.dart';
 
@@ -12,11 +13,13 @@ class TaskListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final vm = context.watch<TasksViewModel>();
     final text = Theme.of(context).textTheme;
+
     final active = vm.activeTasks;
     final completed = vm.completedTasks;
 
     return Scaffold(
       appBar: AppBar(title: const Text('List')),
+      floatingActionButton: const AddTaskFab(),
       body: vm.isLoading
           ? const Center(child: CircularProgressIndicator())
           : active.isEmpty && completed.isEmpty
@@ -28,7 +31,7 @@ class TaskListScreen extends StatelessWidget {
           : SafeArea(
               child: ResponsiveCenter(
                 child: ListView(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.fromLTRB(0, 12, 0, 88),
                   children: [
                     for (final t in active) TaskTile(task: t),
                     if (completed.isNotEmpty) ...[
