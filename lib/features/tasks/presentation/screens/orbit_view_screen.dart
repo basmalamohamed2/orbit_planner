@@ -3,6 +3,7 @@ import 'package:orbit_planner/core/responsive/breakpoints.dart';
 import 'package:orbit_planner/core/responsive/responsive_layout.dart';
 import 'package:orbit_planner/features/tasks/presentation/orbit/orbit_canvas.dart';
 import 'package:orbit_planner/features/tasks/presentation/orbit/orbit_layout.dart';
+import 'package:orbit_planner/features/tasks/presentation/screens/planet_detail_screen.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
 import 'package:orbit_planner/features/tasks/presentation/widgets/add_task_fab.dart';
 import 'package:orbit_planner/features/tasks/presentation/widgets/orbit_info_panel.dart';
@@ -18,24 +19,36 @@ class OrbitViewScreen extends StatefulWidget {
 class _OrbitViewScreenState extends State<OrbitViewScreen> {
   String? _selectedId;
 
+  final _canvasKey = GlobalKey<OrbitCanvasState>();
+
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<TasksViewModel>();
+
     final planets = OrbitLayout.build(vm.activeTasks, DateTime.now());
+
     final candidate = _selectedId == null ? null : vm.taskById(_selectedId!);
     final selected = (candidate != null && !candidate.isCompleted)
         ? candidate
         : null;
+
     final canvas = OrbitCanvas(
+      key: _canvasKey,
       planets: planets,
       selectedId: selected?.id,
       onSelect: (id) => setState(() => _selectedId = id),
     );
+
     final panel = OrbitInfoPanel(
       selected: selected,
       hasPlanets: planets.isNotEmpty,
       onComplete: () {
-        if (selected != null) vm.toggleComplete(selected.id);
+        if (selected == null) return;
+        _canvasKey.currentState?.celebrate(selected.id);
+        vm.toggleComplete(selected.id);
+      },
+      onOpenDetails: () {
+        if (selected != null) openPlanetDetail(context, selected.id);
       },
     );
 

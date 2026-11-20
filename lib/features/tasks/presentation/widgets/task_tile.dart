@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
 import 'package:orbit_planner/features/tasks/domain/task.dart';
+import 'package:orbit_planner/features/tasks/presentation/screens/planet_detail_screen.dart';
 import 'package:orbit_planner/features/tasks/presentation/task_ui.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,7 @@ class TaskTile extends StatelessWidget {
     final overdue = !task.isCompleted && days < 0;
     final subtitle = task.isCompleted
         ? '${task.category.label} · Completed'
-        : '${task.category.label} · ${_dueLabel(days)}';
+        : '${task.category.label} · ${task.dueLabel(DateTime.now())}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -32,6 +33,7 @@ class TaskTile extends StatelessWidget {
           side: BorderSide(color: orbit.outline),
         ),
         child: ListTile(
+          onTap: () => openPlanetDetail(context, task.id),
           leading: SizedBox(
             width: 24,
             height: 24,
@@ -79,13 +81,5 @@ class TaskTile extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  static String _dueLabel(int days) {
-    if (days < -1) return 'Overdue by ${-days} days';
-    if (days == -1) return 'Overdue by 1 day';
-    if (days == 0) return 'Due today';
-    if (days == 1) return 'Due tomorrow';
-    return 'Due in $days days';
   }
 }

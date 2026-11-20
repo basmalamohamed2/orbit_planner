@@ -10,11 +10,13 @@ class OrbitInfoPanel extends StatelessWidget {
     required this.selected,
     required this.hasPlanets,
     required this.onComplete,
+    required this.onOpenDetails,
   });
 
   final Task? selected;
   final bool hasPlanets;
   final VoidCallback onComplete;
+  final VoidCallback onOpenDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,11 @@ class OrbitInfoPanel extends StatelessWidget {
         const _Legend(),
         const SizedBox(height: 16),
         if (selected != null)
-          _SelectedCard(task: selected!, onComplete: onComplete)
+          _SelectedCard(
+            task: selected!,
+            onComplete: onComplete,
+            onOpenDetails: onOpenDetails,
+          )
         else
           Text(
             hasPlanets
@@ -86,10 +92,15 @@ class _Legend extends StatelessWidget {
 }
 
 class _SelectedCard extends StatelessWidget {
-  const _SelectedCard({required this.task, required this.onComplete});
+  const _SelectedCard({
+    required this.task,
+    required this.onComplete,
+    required this.onOpenDetails,
+  });
 
   final Task task;
   final VoidCallback onComplete;
+  final VoidCallback onOpenDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +141,23 @@ class _SelectedCard extends StatelessWidget {
             ),
             Text(task.dueLabel(DateTime.now()), style: text.bodySmall),
             const SizedBox(height: 14),
-            FilledButton(onPressed: onComplete, child: const Text('Complete')),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: onOpenDetails,
+                    child: const Text('Details'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: onComplete,
+                    child: const Text('Complete'),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

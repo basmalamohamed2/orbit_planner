@@ -1,5 +1,8 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/shapes/orbit_drawing.dart';
+import 'package:orbit_planner/core/shapes/star_path.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
 import 'package:orbit_planner/features/tasks/presentation/orbit/orbit_layout.dart';
 import 'package:orbit_planner/features/tasks/presentation/task_ui.dart';
@@ -87,5 +90,86 @@ class OrbitPlanetsPainter extends CustomPainter {
     return old.planets != planets ||
         old.colors != colors ||
         old.selectedId != selectedId;
+  }
+}
+
+class OrbitCelebration {
+  const OrbitCelebration({
+    required this.position,
+    required this.radius,
+    required this.color,
+  });
+
+  final Offset position;
+  final double radius;
+  final Color color;
+}
+
+class OrbitCelebrationPainter extends CustomPainter {
+  OrbitCelebrationPainter({
+    required this.celebration,
+    required this.colors,
+    required this.animation,
+  }) : super(repaint: animation);
+
+  final OrbitCelebration? celebration;
+  final OrbitColors colors;
+  final Animation<double> animation;
+
+  static double _unit(double v) => v.clamp(0.0, 1.0).toDouble();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = celebration;
+    final t = animation.value;
+    if (c == null || t <= 0 || t >= 1) return;
+
+    final pos = c.position + Offset(0, -18 * Curves.easeOut.transform(t));
+
+    final shrink = Curves.easeIn.transform(_unit(t / 0.5));
+    if (shrink < 1) {
+      drawPlanetDisc(
+        canvas,
+        pos,
+        c.radius * (1 - shrink),
+        c.color,
+        colors.shadow,
+      );
+    }
+
+    final popT = _unit((t - 0.3) / 0.7);
+    final starScale = Curves.easeOutBack.transform(popT);
+    final fade = 1 - Curves.easeIn.transform(_unit((t - 0.7) / 0.3));
+    final alpha = (255 * fade).round();
+
+    final star = starPath(
+      pos,
+      c.radius * 1.6 * starScale,
+      rotation: (1 - popT) * 0.8,
+    );
+    canvas.drawPath(
+      star.shift(const Offset(2, 2)),
+      Paint()..color = colors.shadow.withAlpha(alpha),
+    );
+    canvas.drawPath(star, Paint()..color = colors.star.withAlpha(alpha));
+
+    final burstT = _unit((t - 0.35) / 0.65);
+    final dot = Paint()
+      ..color = colors.star.withAlpha((200 * (1 - burstT)).round());
+    for (var i = 0; i < 8; i++) {
+      final angle = i * math.pi / 4 + 0.2;
+      final distance =
+          c.radius * (1.4 + 1.8 * Curves.easeOut.transform(burstT));
+      canvas.drawCircle(
+        pos + Offset(math.cos(angle), math.sin(angle)) * distance,
+        2.2,
+        dot,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(OrbitCelebrationPainter old) {
+    return old.celebration != celebration || old.colors != colors;
   }
 }

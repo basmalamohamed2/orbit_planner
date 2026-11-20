@@ -72,6 +72,34 @@ class TasksViewModel extends ChangeNotifier {
     await _repository.saveTask(updated);
   }
 
+  Future<void> addNote(String taskId, String text) async {
+    final i = _tasks.indexWhere((t) => t.id == taskId);
+    final trimmed = text.trim();
+    if (i == -1 || trimmed.isEmpty) return;
+
+    final note = Note(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      text: trimmed,
+      createdAt: DateTime.now(),
+    );
+    final updated = _tasks[i].copyWith(notes: [..._tasks[i].notes, note]);
+    _tasks[i] = updated;
+    notifyListeners();
+    await _repository.saveTask(updated);
+  }
+
+  Future<void> deleteNote(String taskId, String noteId) async {
+    final i = _tasks.indexWhere((t) => t.id == taskId);
+    if (i == -1) return;
+
+    final updated = _tasks[i].copyWith(
+      notes: _tasks[i].notes.where((n) => n.id != noteId).toList(),
+    );
+    _tasks[i] = updated;
+    notifyListeners();
+    await _repository.saveTask(updated);
+  }
+
   Future<void> deleteTask(String id) async {
     _tasks.removeWhere((t) => t.id == id);
     notifyListeners();
