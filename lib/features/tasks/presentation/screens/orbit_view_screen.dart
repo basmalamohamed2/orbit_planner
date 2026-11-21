@@ -7,6 +7,7 @@ import 'package:orbit_planner/features/tasks/presentation/orbit/orbit_layout.dar
 import 'package:orbit_planner/features/tasks/presentation/screens/planet_detail_screen.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
 import 'package:orbit_planner/features/tasks/presentation/widgets/add_task_fab.dart';
+import 'package:orbit_planner/features/tasks/presentation/widgets/add_task_sheet.dart';
 import 'package:orbit_planner/features/tasks/presentation/widgets/orbit_info_panel.dart';
 import 'package:provider/provider.dart';
 
@@ -52,6 +53,9 @@ class _OrbitViewScreenState extends State<OrbitViewScreen> {
         if (selected == null) return;
         _canvasKey.currentState?.celebrate(selected.id);
         vm.toggleComplete(selected.id);
+      },
+      onEdit: () {
+        if (selected != null) showEditTaskSheet(context, selected);
       },
       onOpenDetails: () {
         if (selected != null) openPlanetDetail(context, selected.id);

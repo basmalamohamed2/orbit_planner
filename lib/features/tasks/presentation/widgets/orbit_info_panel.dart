@@ -11,12 +11,14 @@ class OrbitInfoPanel extends StatelessWidget {
     required this.hasPlanets,
     required this.onComplete,
     required this.onOpenDetails,
+    required this.onEdit,
   });
 
   final Task? selected;
   final bool hasPlanets;
   final VoidCallback onComplete;
   final VoidCallback onOpenDetails;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class OrbitInfoPanel extends StatelessWidget {
             task: selected!,
             onComplete: onComplete,
             onOpenDetails: onOpenDetails,
+            onEdit: onEdit,
           )
         else
           Text(
@@ -96,11 +99,13 @@ class _SelectedCard extends StatelessWidget {
     required this.task,
     required this.onComplete,
     required this.onOpenDetails,
+    required this.onEdit,
   });
 
   final Task task;
   final VoidCallback onComplete;
   final VoidCallback onOpenDetails;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +137,17 @@ class _SelectedCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(child: Text(task.title, style: text.titleMedium)),
+                IconButton(
+                  tooltip: 'Edit task',
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 40,
+                    height: 40,
+                  ),
+                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  onPressed: onEdit,
+                ),
               ],
             ),
             const SizedBox(height: 6),

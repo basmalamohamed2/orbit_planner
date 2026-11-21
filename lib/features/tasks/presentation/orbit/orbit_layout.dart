@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'package:orbit_planner/core/shapes/ellipse.dart';
 import 'package:orbit_planner/features/tasks/domain/task.dart';
 import 'package:orbit_planner/features/tasks/domain/task_priority.dart';
 
@@ -72,15 +73,7 @@ class OrbitLayout {
     final rx = ringRadii[planet.ring] * size;
     final ry = rx * ellipseRatio;
     final angle = planet.baseAngle + t * 2 * math.pi * ringSpins[planet.ring];
-    final tilt = ringTilts[planet.ring];
-
-    final x = rx * math.cos(angle);
-    final y = ry * math.sin(angle);
-    return center +
-        Offset(
-          x * math.cos(tilt) - y * math.sin(tilt),
-          x * math.sin(tilt) + y * math.cos(tilt),
-        );
+    return pointOnEllipse(center, rx, ry, ringTilts[planet.ring], angle);
   }
 
   static OrbitPlanet? hitTest(

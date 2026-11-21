@@ -5,7 +5,6 @@ import 'package:orbit_planner/features/onboarding/presentation/onboarding_screen
 import 'package:orbit_planner/features/settings/data/local_settings_repository.dart';
 import 'package:orbit_planner/features/settings/presentation/view_models/settings_view_model.dart';
 import 'package:orbit_planner/features/tasks/data/local_task_repository.dart';
-import 'package:orbit_planner/features/tasks/domain/sample_tasks.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +16,6 @@ Future<void> main() async {
   final settingsRepository = LocalSettingsRepository(prefs);
   final taskRepository = LocalTaskRepository(
     prefs,
-    firstRunSeed: buildSampleTasks(DateTime.now()),
   );
   final settings = await settingsRepository.load();
 

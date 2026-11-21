@@ -100,6 +100,28 @@ class TasksViewModel extends ChangeNotifier {
     await _repository.saveTask(updated);
   }
 
+  Future<void> updateTask(
+    String id, {
+    required String title,
+    required TaskCategory category,
+    required TaskPriority priority,
+    required DateTime dueDate,
+  }) async {
+    final i = _tasks.indexWhere((t) => t.id == id);
+    final trimmed = title.trim();
+    if (i == -1 || trimmed.isEmpty) return;
+
+    final updated = _tasks[i].copyWith(
+      title: trimmed,
+      category: category,
+      priority: priority,
+      dueDate: dueDate,
+    );
+    _tasks[i] = updated;
+    notifyListeners();
+    await _repository.saveTask(updated);
+  }
+
   Future<void> restoreTask(Task task) async {
     if (_tasks.any((t) => t.id == task.id)) return;
     _tasks.add(task);

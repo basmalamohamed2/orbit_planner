@@ -8,6 +8,7 @@ import 'package:orbit_planner/features/settings/presentation/view_models/setting
 import 'package:orbit_planner/features/tasks/domain/task.dart';
 import 'package:orbit_planner/features/tasks/presentation/task_ui.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
+import 'package:orbit_planner/features/tasks/presentation/widgets/add_task_sheet.dart';
 import 'package:orbit_planner/features/tasks/presentation/widgets/moon_notes_section.dart';
 import 'package:orbit_planner/features/tasks/presentation/widgets/planet_with_moons.dart';
 import 'package:provider/provider.dart';
@@ -64,6 +65,11 @@ class PlanetDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Planet'),
         actions: [
+          IconButton(
+            tooltip: 'Edit task',
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () => showEditTaskSheet(context, task),
+          ),
           IconButton(
             tooltip: 'Delete task',
             icon: const Icon(Icons.delete_outline),

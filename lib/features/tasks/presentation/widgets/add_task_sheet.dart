@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
+import 'package:orbit_planner/features/tasks/domain/task.dart';
 import 'package:orbit_planner/features/tasks/domain/task_category.dart';
 import 'package:orbit_planner/features/tasks/domain/task_priority.dart';
 import 'package:orbit_planner/features/tasks/presentation/orbit/orbit_layout.dart';
@@ -8,18 +9,26 @@ import 'package:orbit_planner/features/tasks/presentation/task_ui.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
 import 'package:provider/provider.dart';
 
-Future<void> showAddTaskSheet(BuildContext context) {
+Future<void> showAddTaskSheet(BuildContext context) =>
+    _showTaskSheet(context, null);
+
+Future<void> showEditTaskSheet(BuildContext context, Task task) =>
+    _showTaskSheet(context, task);
+
+Future<void> _showTaskSheet(BuildContext context, Task? task) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
     constraints: const BoxConstraints(maxWidth: 560),
-    builder: (_) => const AddTaskSheet(),
+    builder: (_) => AddTaskSheet(task: task),
   );
 }
 
 class AddTaskSheet extends StatefulWidget {
-  const AddTaskSheet({super.key});
+  const AddTaskSheet({super.key, this.task});
+
+  final Task? task;
 
   @override
   State<AddTaskSheet> createState() => _AddTaskSheetState();
@@ -27,11 +36,23 @@ class AddTaskSheet extends StatefulWidget {
 
 class _AddTaskSheetState extends State<AddTaskSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
+  late final TextEditingController _titleController;
 
-  TaskCategory _category = TaskCategory.study;
-  TaskPriority _priority = TaskPriority.medium;
-  DateTime _dueDate = _dateFromToday(3);
+  late TaskCategory _category;
+  late TaskPriority _priority;
+  late DateTime _dueDate;
+
+  bool get _isEditing => widget.task != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final task = widget.task;
+    _titleController = TextEditingController(text: task?.title ?? '');
+    _category = task?.category ?? TaskCategory.study;
+    _priority = task?.priority ?? TaskPriority.medium;
+    _dueDate = task == null ? _dateFromToday(3) : _dateOnly(task.dueDate);
+  }
 
   @override
   void dispose() {
@@ -40,10 +61,12 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
   }
 
   Future<void> _pickDate() async {
-    final first = _dateFromToday(0);
+    final today = _dateFromToday(0);
+    final first = _dueDate.isBefore(today) ? _dueDate : today;
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: _dueDate.isBefore(first) ? first : _dueDate,
+      initialDate: _dueDate,
       firstDate: first,
       lastDate: _dateFromToday(365 * 3),
     );
@@ -55,16 +78,31 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
 
     final title = _titleController.text.trim();
     final messenger = ScaffoldMessenger.of(context);
+    final vm = context.read<TasksViewModel>();
 
-    context.read<TasksViewModel>().addTask(
-      title: title,
-      category: _category,
-      priority: _priority,
-      dueDate: _dueDate,
-    );
+    if (_isEditing) {
+      vm.updateTask(
+        widget.task!.id,
+        title: title,
+        category: _category,
+        priority: _priority,
+        dueDate: _dueDate,
+      );
+    } else {
+      vm.addTask(
+        title: title,
+        category: _category,
+        priority: _priority,
+        dueDate: _dueDate,
+      );
+    }
 
     Navigator.of(context).pop();
-    messenger.showSnackBar(SnackBar(content: Text('Planet launched: $title')));
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(_isEditing ? 'Changes saved' : 'Planet launched: $title'),
+      ),
+    );
   }
 
   @override
@@ -87,7 +125,10 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('New planet', style: text.headlineMedium),
+              Text(
+                _isEditing ? 'Edit planet' : 'New planet',
+                style: text.headlineMedium,
+              ),
               const SizedBox(height: 12),
               _PlanetPreview(
                 color: _category.color(orbit),
@@ -97,7 +138,7 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _titleController,
-                autofocus: true,
+                autofocus: !_isEditing,
                 textCapitalization: TextCapitalization.sentences,
                 textInputAction: TextInputAction.done,
                 inputFormatters: [LengthLimitingTextInputFormatter(60)],
@@ -181,7 +222,7 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _submit,
-                child: const Text('Launch planet'),
+                child: Text(_isEditing ? 'Save changes' : 'Launch planet'),
               ),
             ],
           ),
@@ -206,6 +247,8 @@ class _PlanetPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final orbit = context.orbit;
+
+    // نفس نسب الـ Orbit View عشان المعاينة تطابق اللي هيظهر
     final diameter = OrbitLayout.planetRadius(priority) * 2000;
     final (title, hint) = switch (ring) {
       0 => ('Inner orbit', 'Due within 3 days, close to the sun'),
@@ -249,6 +292,8 @@ class _PlanetPreview extends StatelessWidget {
     );
   }
 }
+
+DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
 DateTime _dateFromToday(int days) {
   final now = DateTime.now();

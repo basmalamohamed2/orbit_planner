@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/shapes/orbit_drawing.dart';
-import 'package:orbit_planner/core/shapes/star_path.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
 import 'package:orbit_planner/features/tasks/presentation/orbit/orbit_layout.dart';
 import 'package:orbit_planner/features/tasks/presentation/task_ui.dart';
@@ -142,16 +141,15 @@ class OrbitCelebrationPainter extends CustomPainter {
     final fade = 1 - Curves.easeIn.transform(_unit((t - 0.7) / 0.3));
     final alpha = (255 * fade).round();
 
-    final star = starPath(
+    drawStar(
+      canvas,
       pos,
       c.radius * 1.6 * starScale,
+      colors.star.withAlpha(alpha),
+      colors.shadow.withAlpha(alpha),
       rotation: (1 - popT) * 0.8,
+      shadowOffset: const Offset(2, 2),
     );
-    canvas.drawPath(
-      star.shift(const Offset(2, 2)),
-      Paint()..color = colors.shadow.withAlpha(alpha),
-    );
-    canvas.drawPath(star, Paint()..color = colors.star.withAlpha(alpha));
 
     final burstT = _unit((t - 0.35) / 0.65);
     final dot = Paint()

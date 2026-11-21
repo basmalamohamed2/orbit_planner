@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/motion/motion.dart';
+import 'package:orbit_planner/core/shapes/ellipse.dart';
 import 'package:orbit_planner/core/shapes/orbit_drawing.dart';
-import 'package:orbit_planner/core/shapes/star_path.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
 import 'package:orbit_planner/features/tasks/domain/task.dart';
 import 'package:orbit_planner/features/tasks/presentation/task_ui.dart';
@@ -117,12 +117,14 @@ class _BodyPainter extends CustomPainter {
     drawDashedEllipse(canvas, c, rx, rx * 0.96, _moonRingTilt, ringColor);
 
     if (completed) {
-      final star = starPath(c, s * _planetRadius * 1.35);
-      canvas.drawPath(
-        star.shift(const Offset(2, 2)),
-        Paint()..color = colors.shadow,
+      drawStar(
+        canvas,
+        c,
+        s * _planetRadius * 1.35,
+        colors.star,
+        colors.shadow,
+        shadowOffset: const Offset(2, 2),
       );
-      canvas.drawPath(star, Paint()..color = colors.star);
     } else {
       drawPlanetDisc(
         canvas,
@@ -168,14 +170,7 @@ class _MoonsPainter extends CustomPainter {
     for (var i = 0; i < moonCount; i++) {
       final angle =
           0.6 + i * 2 * math.pi / moonCount + animation.value * 2 * math.pi;
-      final x = rx * math.cos(angle);
-      final y = ry * math.sin(angle);
-      final pos =
-          c +
-          Offset(
-            x * math.cos(_moonRingTilt) - y * math.sin(_moonRingTilt),
-            x * math.sin(_moonRingTilt) + y * math.cos(_moonRingTilt),
-          );
+      final pos = pointOnEllipse(c, rx, ry, _moonRingTilt, angle);
       drawPlanetDisc(canvas, pos, s * _moonRadius, moonColor, colors.shadow);
     }
   }

@@ -3,7 +3,6 @@ import 'package:orbit_planner/core/responsive/responsive_layout.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
 import 'package:orbit_planner/features/settings/domain/app_settings.dart';
 import 'package:orbit_planner/features/settings/presentation/view_models/settings_view_model.dart';
-import 'package:orbit_planner/features/tasks/domain/sample_tasks.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -34,22 +33,6 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
     return result ?? false;
-  }
-
-  Future<void> _loadSamples(BuildContext context) async {
-    final tasks = context.read<TasksViewModel>();
-    final messenger = ScaffoldMessenger.of(context);
-
-    final ok = await _confirm(
-      context,
-      title: 'Load sample data?',
-      message: 'This replaces all your current tasks with a few examples.',
-      action: 'Replace',
-    );
-    if (!ok) return;
-
-    await tasks.replaceAll(buildSampleTasks(DateTime.now()));
-    messenger.showSnackBar(const SnackBar(content: Text('Sample data loaded')));
   }
 
   Future<void> _clearAll(BuildContext context) async {
@@ -154,15 +137,6 @@ class SettingsScreen extends StatelessWidget {
               _Section(
                 title: 'DATA',
                 children: [
-                  ListTile(
-                    title: Text('Load sample data', style: text.titleMedium),
-                    subtitle: Text(
-                      'Replace your tasks with a few examples',
-                      style: text.bodySmall,
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => _loadSamples(context),
-                  ),
                   ListTile(
                     title: Text(
                       'Clear all tasks',

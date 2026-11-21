@@ -1,7 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:orbit_planner/core/shapes/star_path.dart';
+import 'package:orbit_planner/core/shapes/ellipse.dart';
+import 'package:orbit_planner/core/shapes/orbit_drawing.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
 import 'package:orbit_planner/features/onboarding/presentation/onboarding_slides.dart';
 
@@ -47,11 +46,27 @@ class _ArtPainter extends CustomPainter {
     const rot = -0.1;
     final rx = s * 0.38;
     final ry = s * 0.36;
+
     _ring(canvas, c, rx, ry, rot);
-    _sun(canvas, c, s * 0.13);
-    _planet(canvas, _onRing(c, rx, ry, rot, -0.9), s * 0.075, colors.personal);
-    _planet(canvas, _onRing(c, rx, ry, rot, 2.4), s * 0.055, colors.work);
-    _planet(canvas, _onRing(c, rx, ry, rot, 4.3), s * 0.04, colors.study);
+    drawSunDisc(canvas, c, s * 0.13, colors.sun, colors.shadow);
+    _planet(
+      canvas,
+      pointOnEllipse(c, rx, ry, rot, -0.9),
+      s * 0.075,
+      colors.personal,
+    );
+    _planet(
+      canvas,
+      pointOnEllipse(c, rx, ry, rot, 2.4),
+      s * 0.055,
+      colors.work,
+    );
+    _planet(
+      canvas,
+      pointOnEllipse(c, rx, ry, rot, 4.3),
+      s * 0.04,
+      colors.study,
+    );
   }
 
   void _paintOrbits(Canvas canvas, double s, Offset c) {
@@ -65,23 +80,23 @@ class _ArtPainter extends CustomPainter {
     _ring(canvas, c, outer[0], outer[1], rotOuter);
     _ring(canvas, c, mid[0], mid[1], rotMid);
     _ring(canvas, c, inner[0], inner[1], rotInner);
-    _sun(canvas, c, s * 0.08);
+    drawSunDisc(canvas, c, s * 0.08, colors.sun, colors.shadow);
 
     _planet(
       canvas,
-      _onRing(c, inner[0], inner[1], rotInner, 0.6),
+      pointOnEllipse(c, inner[0], inner[1], rotInner, 0.6),
       s * 0.06,
       colors.personal,
     );
     _planet(
       canvas,
-      _onRing(c, mid[0], mid[1], rotMid, 3.6),
+      pointOnEllipse(c, mid[0], mid[1], rotMid, 3.6),
       s * 0.05,
       colors.work,
     );
     _planet(
       canvas,
-      _onRing(c, outer[0], outer[1], rotOuter, 5.3),
+      pointOnEllipse(c, outer[0], outer[1], rotOuter, 5.3),
       s * 0.04,
       colors.study,
     );
@@ -99,7 +114,14 @@ class _ArtPainter extends CustomPainter {
       [0.52, 0.90, 0.045, -0.2],
     ];
     for (final st in stars) {
-      _star(canvas, Offset(s * st[0], s * st[1]), s * st[2], st[3]);
+      drawStar(
+        canvas,
+        Offset(s * st[0], s * st[1]),
+        s * st[2],
+        colors.star,
+        colors.shadow,
+        rotation: st[3],
+      );
     }
 
     final dot = Paint()..color = _ringColor;
@@ -115,78 +137,11 @@ class _ArtPainter extends CustomPainter {
   }
 
   void _ring(Canvas canvas, Offset c, double rx, double ry, double rot) {
-    canvas.save();
-    canvas.translate(c.dx, c.dy);
-    canvas.rotate(rot);
-
-    final path = Path()
-      ..addOval(
-        Rect.fromCenter(center: Offset.zero, width: rx * 2, height: ry * 2),
-      );
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4
-      ..color = _ringColor;
-
-    for (final metric in path.computeMetrics()) {
-      double d = 0;
-      while (d < metric.length) {
-        canvas.drawPath(
-          metric.extractPath(d, math.min(d + 4, metric.length)),
-          paint,
-        );
-        d += 9;
-      }
-    }
-    canvas.restore();
-  }
-
-  Offset _onRing(Offset c, double rx, double ry, double rot, double a) {
-    final x = rx * math.cos(a);
-    final y = ry * math.sin(a);
-    return c +
-        Offset(
-          x * math.cos(rot) - y * math.sin(rot),
-          x * math.sin(rot) + y * math.cos(rot),
-        );
+    drawDashedEllipse(canvas, c, rx, ry, rot, _ringColor);
   }
 
   void _planet(Canvas canvas, Offset p, double r, Color color) {
-    canvas.drawCircle(
-      p + const Offset(2, 2),
-      r,
-      Paint()..color = colors.shadow,
-    );
-    canvas.drawCircle(p, r, Paint()..color = color);
-    canvas.drawCircle(
-      p + Offset(r * 0.3, -r * 0.3),
-      r * 0.18,
-      Paint()..color = const Color.fromRGBO(255, 255, 255, 0.3),
-    );
-  }
-
-  void _sun(Canvas canvas, Offset c, double r) {
-    canvas.drawCircle(
-      c + const Offset(2, 2),
-      r,
-      Paint()..color = colors.shadow,
-    );
-    canvas.drawCircle(c, r, Paint()..color = colors.sun);
-    canvas.drawCircle(
-      c,
-      r * 0.4,
-      Paint()..color = const Color.fromRGBO(255, 255, 255, 0.45),
-    );
-  }
-
-  void _star(Canvas canvas, Offset c, double r, double rotation) {
-    final path = starPath(c, r, rotation: rotation);
-
-    canvas.drawPath(
-      path.shift(const Offset(1.5, 1.5)),
-      Paint()..color = colors.shadow,
-    );
-    canvas.drawPath(path, Paint()..color = colors.star);
+    drawPlanetDisc(canvas, p, r, color, colors.shadow);
   }
 
   @override

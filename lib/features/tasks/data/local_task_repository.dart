@@ -6,13 +6,11 @@ import 'package:orbit_planner/features/tasks/domain/task_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalTaskRepository implements TaskRepository {
-  LocalTaskRepository(this._prefs, {List<Task> firstRunSeed = const []})
-    : _firstRunSeed = firstRunSeed;
+  LocalTaskRepository(this._prefs);
 
   static const storageKey = 'tasks_v1';
 
   final SharedPreferences _prefs;
-  final List<Task> _firstRunSeed;
 
   List<Task>? _cache;
 
@@ -20,7 +18,7 @@ class LocalTaskRepository implements TaskRepository {
 
   List<Task> _read() {
     final raw = _prefs.getString(storageKey);
-    if (raw == null) return List.of(_firstRunSeed);
+    if (raw == null) return [];
 
     try {
       final decoded = jsonDecode(raw) as List<dynamic>;
@@ -42,12 +40,7 @@ class LocalTaskRepository implements TaskRepository {
   }
 
   @override
-  Future<List<Task>> getTasks() async {
-    final isFirstRun = _cache == null && _prefs.getString(storageKey) == null;
-    final tasks = _tasks;
-    if (isFirstRun) await _write();
-    return List.unmodifiable(tasks);
-  }
+  Future<List<Task>> getTasks() async => List.unmodifiable(_tasks);
 
   @override
   Future<void> saveTask(Task task) async {

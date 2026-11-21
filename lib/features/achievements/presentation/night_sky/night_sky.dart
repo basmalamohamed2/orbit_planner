@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/motion/motion.dart';
-import 'package:orbit_planner/core/shapes/star_path.dart';
+import 'package:orbit_planner/core/shapes/orbit_drawing.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
 import 'package:orbit_planner/features/achievements/presentation/night_sky/night_sky_layout.dart';
 import 'package:orbit_planner/features/tasks/domain/task.dart';
@@ -156,17 +156,14 @@ class _StarsPainter extends CustomPainter {
 
     for (final star in stars) {
       final scale = 1 + 0.07 * math.sin(2 * math.pi * (t + star.phase));
-      final path = starPath(
+      drawStar(
+        canvas,
         star.center,
         star.radius * scale,
+        colors.star,
+        colors.shadow,
         rotation: star.rotation,
       );
-
-      canvas.drawPath(
-        path.shift(const Offset(1.5, 1.5)),
-        Paint()..color = colors.shadow,
-      );
-      canvas.drawPath(path, Paint()..color = colors.star);
     }
   }
 
