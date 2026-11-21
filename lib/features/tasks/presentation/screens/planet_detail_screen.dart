@@ -122,10 +122,9 @@ class _PlanetHeader extends StatelessWidget {
     final motion = context.select<SettingsViewModel, bool>(
       (s) => s.motionEnabled,
     );
-
     final statusLabel = task.isCompleted
         ? 'Completed ${dates.formatMediumDate(task.completedAt ?? DateTime.now())}'
-        : task.dueLabel(DateTime.now());
+        : task.dueLabelOf(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

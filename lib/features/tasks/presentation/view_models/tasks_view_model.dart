@@ -18,7 +18,7 @@ class TasksViewModel extends ChangeNotifier {
 
   List<Task> get activeTasks =>
       _tasks.where((t) => !t.isCompleted).toList()
-        ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
+        ..sort((a, b) => a.dueMoment.compareTo(b.dueMoment));
 
   List<Task> get completedTasks => _tasks.where((t) => t.isCompleted).toList()
     ..sort(
@@ -46,6 +46,7 @@ class TasksViewModel extends ChangeNotifier {
     required TaskCategory category,
     required TaskPriority priority,
     required DateTime dueDate,
+    bool hasTime = false,
   }) async {
     final task = Task(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
@@ -53,6 +54,7 @@ class TasksViewModel extends ChangeNotifier {
       category: category,
       priority: priority,
       dueDate: dueDate,
+      hasTime: hasTime,
     );
     _tasks.add(task);
     notifyListeners();
@@ -106,6 +108,7 @@ class TasksViewModel extends ChangeNotifier {
     required TaskCategory category,
     required TaskPriority priority,
     required DateTime dueDate,
+    bool hasTime = false,
   }) async {
     final i = _tasks.indexWhere((t) => t.id == id);
     final trimmed = title.trim();
@@ -116,6 +119,7 @@ class TasksViewModel extends ChangeNotifier {
       category: category,
       priority: priority,
       dueDate: dueDate,
+      hasTime: hasTime,
     );
     _tasks[i] = updated;
     notifyListeners();

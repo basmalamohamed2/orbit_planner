@@ -9,6 +9,7 @@ Map<String, dynamic> taskToJson(Task task) {
     'category': task.category.name,
     'priority': task.priority.name,
     'dueDate': task.dueDate.toIso8601String(),
+    'hasTime': task.hasTime,
     'isCompleted': task.isCompleted,
     'completedAt': task.completedAt?.toIso8601String(),
     'notes': [
@@ -31,6 +32,7 @@ Task taskFromJson(Map<String, dynamic> json) {
     category: TaskCategory.values.byName(json['category'] as String),
     priority: TaskPriority.values.byName(json['priority'] as String),
     dueDate: DateTime.parse(json['dueDate'] as String),
+    hasTime: json['hasTime'] as bool? ?? false,
     isCompleted: json['isCompleted'] as bool? ?? false,
     completedAt: completedAt == null ? null : DateTime.parse(completedAt),
     notes: [

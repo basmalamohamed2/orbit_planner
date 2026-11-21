@@ -155,7 +155,7 @@ class _SelectedCard extends StatelessWidget {
               '${task.category.label} · ${task.priority.label} priority',
               style: text.bodySmall,
             ),
-            Text(task.dueLabel(DateTime.now()), style: text.bodySmall),
+            Text(task.dueLabelOf(context), style: text.bodySmall),
             const SizedBox(height: 14),
             Row(
               children: [

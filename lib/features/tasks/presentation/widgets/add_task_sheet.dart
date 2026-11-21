@@ -37,12 +37,25 @@ class AddTaskSheet extends StatefulWidget {
 class _AddTaskSheetState extends State<AddTaskSheet> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _titleController;
-
   late TaskCategory _category;
   late TaskPriority _priority;
   late DateTime _dueDate;
 
+  TimeOfDay? _time;
+
   bool get _isEditing => widget.task != null;
+
+  DateTime get _combined {
+    final t = _time;
+    if (t == null) return _dueDate;
+    return DateTime(
+      _dueDate.year,
+      _dueDate.month,
+      _dueDate.day,
+      t.hour,
+      t.minute,
+    );
+  }
 
   @override
   void initState() {
@@ -52,6 +65,9 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
     _category = task?.category ?? TaskCategory.study;
     _priority = task?.priority ?? TaskPriority.medium;
     _dueDate = task == null ? _dateFromToday(3) : _dateOnly(task.dueDate);
+    _time = (task != null && task.hasTime)
+        ? TimeOfDay.fromDateTime(task.dueDate)
+        : null;
   }
 
   @override
@@ -73,6 +89,22 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
     if (picked != null) setState(() => _dueDate = picked);
   }
 
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _time ?? _suggestedTime(),
+    );
+    if (picked != null) setState(() => _time = picked);
+  }
+
+  TimeOfDay _suggestedTime() {
+    if (_daysFromToday(_dueDate) == 0) {
+      final next = DateTime.now().add(const Duration(hours: 1));
+      return TimeOfDay(hour: next.hour, minute: 0);
+    }
+    return const TimeOfDay(hour: 9, minute: 0);
+  }
+
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
 
@@ -86,14 +118,16 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
         title: title,
         category: _category,
         priority: _priority,
-        dueDate: _dueDate,
+        dueDate: _combined,
+        hasTime: _time != null,
       );
     } else {
       vm.addTask(
         title: title,
         category: _category,
         priority: _priority,
-        dueDate: _dueDate,
+        dueDate: _combined,
+        hasTime: _time != null,
       );
     }
 
@@ -108,8 +142,10 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
     final orbit = context.orbit;
     final days = _daysFromToday(_dueDate);
+    final timeHasPassed = _time != null && _combined.isBefore(DateTime.now());
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -219,6 +255,36 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                   MaterialLocalizations.of(context).formatMediumDate(_dueDate),
                 ),
               ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _pickTime,
+                      icon: const Icon(Icons.schedule, size: 18),
+                      label: Text(
+                        _time == null
+                            ? 'Add time (optional)'
+                            : formatDueTime(context, _time!),
+                      ),
+                    ),
+                  ),
+                  if (_time != null)
+                    IconButton(
+                      tooltip: 'Remove time',
+                      icon: const Icon(Icons.close),
+                      onPressed: () => setState(() => _time = null),
+                    ),
+                ],
+              ),
+              if (timeHasPassed)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    'That time has already passed.',
+                    style: text.bodySmall?.copyWith(color: scheme.secondary),
+                  ),
+                ),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _submit,
@@ -247,8 +313,6 @@ class _PlanetPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final orbit = context.orbit;
-
-    // نفس نسب الـ Orbit View عشان المعاينة تطابق اللي هيظهر
     final diameter = OrbitLayout.planetRadius(priority) * 2000;
     final (title, hint) = switch (ring) {
       0 => ('Inner orbit', 'Due within 3 days, close to the sun'),

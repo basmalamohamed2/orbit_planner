@@ -20,13 +20,34 @@ extension TaskPriorityUi on TaskPriority {
   };
 }
 
+String formatDueTime(BuildContext context, TimeOfDay time) {
+  return MaterialLocalizations.of(context).formatTimeOfDay(
+    time,
+    alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+  );
+}
+
 extension TaskUi on Task {
-  String dueLabel(DateTime now) {
+  String dueLabel(DateTime now, {String? timeText}) {
+    final at = (hasTime && timeText != null) ? ' · $timeText' : '';
     final days = daysUntilDue(now);
+
     if (days < -1) return 'Overdue by ${-days} days';
     if (days == -1) return 'Overdue by 1 day';
-    if (days == 0) return 'Due today';
-    if (days == 1) return 'Due tomorrow';
-    return 'Due in $days days';
+    if (days == 0) {
+      if (hasTime && timeText != null && isOverdue(now)) {
+        return 'Overdue since $timeText';
+      }
+      return 'Due today$at';
+    }
+    if (days == 1) return 'Due tomorrow$at';
+    return 'Due in $days days$at';
+  }
+
+  String dueLabelOf(BuildContext context) {
+    final timeText = hasTime
+        ? formatDueTime(context, TimeOfDay.fromDateTime(dueDate))
+        : null;
+    return dueLabel(DateTime.now(), timeText: timeText);
   }
 }

@@ -17,11 +17,10 @@ class TaskTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final orbit = context.orbit;
 
-    final days = task.daysUntilDue(DateTime.now());
-    final overdue = !task.isCompleted && days < 0;
+    final overdue = !task.isCompleted && task.isOverdue(DateTime.now());
     final subtitle = task.isCompleted
         ? '${task.category.label} · Completed'
-        : '${task.category.label} · ${task.dueLabel(DateTime.now())}';
+        : '${task.category.label} · ${task.dueLabelOf(context)}';
 
     return Material(
       color: scheme.surfaceContainer,

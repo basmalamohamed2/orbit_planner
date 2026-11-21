@@ -16,6 +16,7 @@ class Task {
     required this.category,
     required this.priority,
     required this.dueDate,
+    this.hasTime = false,
     this.isCompleted = false,
     this.completedAt,
     this.notes = const [],
@@ -26,9 +27,16 @@ class Task {
   final TaskCategory category;
   final TaskPriority priority;
   final DateTime dueDate;
+  final bool hasTime;
   final bool isCompleted;
   final DateTime? completedAt;
   final List<Note> notes;
+
+  DateTime get dueMoment => hasTime
+      ? dueDate
+      : DateTime(dueDate.year, dueDate.month, dueDate.day, 23, 59, 59);
+
+  bool isOverdue(DateTime now) => dueMoment.isBefore(now);
 
   int daysUntilDue(DateTime now) {
     final today = DateTime.utc(now.year, now.month, now.day);
@@ -41,6 +49,7 @@ class Task {
     TaskCategory? category,
     TaskPriority? priority,
     DateTime? dueDate,
+    bool? hasTime,
     List<Note>? notes,
   }) {
     return Task(
@@ -49,6 +58,7 @@ class Task {
       category: category ?? this.category,
       priority: priority ?? this.priority,
       dueDate: dueDate ?? this.dueDate,
+      hasTime: hasTime ?? this.hasTime,
       isCompleted: isCompleted,
       completedAt: completedAt,
       notes: notes ?? this.notes,
@@ -62,6 +72,7 @@ class Task {
       category: category,
       priority: priority,
       dueDate: dueDate,
+      hasTime: hasTime,
       isCompleted: true,
       completedAt: at,
       notes: notes,
@@ -75,6 +86,7 @@ class Task {
       category: category,
       priority: priority,
       dueDate: dueDate,
+      hasTime: hasTime,
       isCompleted: false,
       completedAt: null,
       notes: notes,
