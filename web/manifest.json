@@ -1,11 +1,11 @@
 {
-    "name": "orbit_planner",
-    "short_name": "orbit_planner",
+    "name": "Orbit Planner",
+    "short_name": "Orbit Planner",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "A note and to-do app where tasks orbit you and completed tasks become stars.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
