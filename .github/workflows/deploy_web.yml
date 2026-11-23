@@ -19,18 +19,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.24.3
           channel: stable
           cache: true
+
       - run: flutter pub get
+
       - run: flutter test
+
       - run: >
           flutter build web --release
-          --web-renderer canvaskit
           --base-href "/${{ github.event.repository.name }}/"
+
       - uses: actions/configure-pages@v4
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
