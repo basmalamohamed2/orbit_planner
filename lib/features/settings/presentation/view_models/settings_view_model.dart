@@ -11,6 +11,8 @@ class SettingsViewModel extends ChangeNotifier {
   AppThemeMode get appThemeMode => _settings.themeMode;
   bool get motionEnabled => _settings.motionEnabled;
   bool get onboardingSeen => _settings.onboardingSeen;
+  bool get remindersEnabled => _settings.remindersEnabled;
+  ReminderLead get reminderLead => _settings.reminderLead;
 
   ThemeMode get themeMode => switch (_settings.themeMode) {
     AppThemeMode.system => ThemeMode.system,
@@ -29,6 +31,12 @@ class SettingsViewModel extends ChangeNotifier {
 
   Future<void> resetOnboarding() =>
       _update(_settings.copyWith(onboardingSeen: false));
+
+  Future<void> setRemindersEnabled(bool enabled) =>
+      _update(_settings.copyWith(remindersEnabled: enabled));
+
+  Future<void> setReminderLead(ReminderLead lead) =>
+      _update(_settings.copyWith(reminderLead: lead));
 
   Future<void> _update(AppSettings next) async {
     _settings = next;

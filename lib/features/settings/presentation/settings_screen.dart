@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:orbit_planner/core/responsive/responsive_layout.dart';
 import 'package:orbit_planner/core/theme/orbit_colors.dart';
+import 'package:orbit_planner/features/notifications/domain/reminder_service.dart';
 import 'package:orbit_planner/features/settings/domain/app_settings.dart';
 import 'package:orbit_planner/features/settings/presentation/view_models/settings_view_model.dart';
 import 'package:orbit_planner/features/tasks/presentation/view_models/tasks_view_model.dart';
@@ -52,9 +53,34 @@ class SettingsScreen extends StatelessWidget {
     messenger.showSnackBar(const SnackBar(content: Text('All tasks cleared')));
   }
 
+  Future<void> _toggleReminders(BuildContext context, bool enable) async {
+    final settings = context.read<SettingsViewModel>();
+    final reminders = context.read<ReminderService>();
+    final messenger = ScaffoldMessenger.of(context);
+
+    if (!enable) {
+      await settings.setRemindersEnabled(false);
+      return;
+    }
+
+    final granted = await reminders.requestPermission();
+    if (!granted) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Notifications are blocked. Allow them in your phone’s settings.',
+          ),
+        ),
+      );
+      return;
+    }
+    await settings.setRemindersEnabled(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsViewModel>();
+    final reminders = context.read<ReminderService>();
     final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
 
@@ -116,6 +142,58 @@ class SettingsScreen extends StatelessWidget {
                       style: text.bodySmall,
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _Section(
+                title: 'REMINDERS',
+                children: [
+                  SwitchListTile(
+                    value: reminders.isSupported && settings.remindersEnabled,
+                    onChanged: reminders.isSupported
+                        ? (value) => _toggleReminders(context, value)
+                        : null,
+                    title: Text('Task reminders', style: text.titleMedium),
+                    subtitle: Text(
+                      reminders.isSupported
+                          ? 'Get a notification when a task is due'
+                          : 'Not available in the web version. '
+                                'Install the Android app to use reminders.',
+                      style: text.bodySmall,
+                    ),
+                  ),
+                  if (reminders.isSupported && settings.remindersEnabled)
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Remind me', style: text.titleMedium),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Before the deadline. Tasks without a time remind you at 9:00 AM.',
+                            style: text.bodySmall,
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: SegmentedButton<ReminderLead>(
+                              showSelectedIcon: false,
+                              segments: [
+                                for (final lead in ReminderLead.values)
+                                  ButtonSegment(
+                                    value: lead,
+                                    label: Text(lead.label),
+                                  ),
+                              ],
+                              selected: {settings.reminderLead},
+                              onSelectionChanged: (selection) =>
+                                  settings.setReminderLead(selection.first),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 24),

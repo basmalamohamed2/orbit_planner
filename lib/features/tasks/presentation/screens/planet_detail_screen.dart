@@ -13,8 +13,11 @@ import 'package:orbit_planner/features/tasks/presentation/widgets/moon_notes_sec
 import 'package:orbit_planner/features/tasks/presentation/widgets/planet_with_moons.dart';
 import 'package:provider/provider.dart';
 
-void openPlanetDetail(BuildContext context, String taskId) {
-  Navigator.of(context).push(
+void openPlanetDetail(BuildContext context, String taskId) =>
+    openPlanetDetailOn(Navigator.of(context), taskId);
+
+void openPlanetDetailOn(NavigatorState navigator, String taskId) {
+  navigator.push(
     MaterialPageRoute<void>(builder: (_) => PlanetDetailScreen(taskId: taskId)),
   );
 }
@@ -122,6 +125,7 @@ class _PlanetHeader extends StatelessWidget {
     final motion = context.select<SettingsViewModel, bool>(
       (s) => s.motionEnabled,
     );
+
     final statusLabel = task.isCompleted
         ? 'Completed ${dates.formatMediumDate(task.completedAt ?? DateTime.now())}'
         : task.dueLabelOf(context);
