@@ -1,5 +1,3 @@
-
-https://github.com/user-attachments/assets/6d1a3299-ee10-473c-b559-d8129ed2b63f
 # Orbit Planner
 
 **A note & to-do app where your tasks orbit you, and finished tasks become stars.**
@@ -117,4 +115,4 @@ The web version is deployed automatically to GitHub Pages on every push to `main
 
 ## Demo
 
-Uploading OrbitPlannerDemo.mp4…
+https://github.com/user-attachments/assets/bbc67eb2-1d89-479c-90ca-c12284715170
